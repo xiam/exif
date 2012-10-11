@@ -124,14 +124,14 @@ import (
 )
 
 type Data struct {
-	ed *C.ExifData
-	Tags map[string] string
+	ed   *C.ExifData
+	Tags map[string]string
 }
 
 func New() *Data {
 	self := &Data{}
-	self.Tags = make(map[string] string)
-	return self;
+	self.Tags = make(map[string]string)
+	return self
 }
 
 func (self *Data) Open(file string) error {
@@ -144,10 +144,10 @@ func (self *Data) Open(file string) error {
 
 	values := C.exif_dump(self.ed)
 
-	for ; true;  {
-		value := C.pop_exif_value(values);
+	for true {
+		value := C.pop_exif_value(values)
 		if value == nil {
-			break;
+			break
 		} else {
 			self.Tags[strings.Trim(C.GoString((*value).name), " ")] = strings.Trim(C.GoString((*value).value), " ")
 		}
@@ -158,4 +158,3 @@ func (self *Data) Open(file string) error {
 
 	return nil
 }
-
