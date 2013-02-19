@@ -1,5 +1,5 @@
 /*
-  Copyright (c) 2012 José Carlos Nieto, http://xiam.menteslibres.org/
+  Copyright (c) 2012-2013 José Carlos Nieto, http://xiam.menteslibres.org/
 
   Permission is hereby granted, free of charge, to any person obtaining
   a copy of this software and associated documentation files (the
@@ -136,7 +136,12 @@ func New() *Data {
 
 func (self *Data) Open(file string) error {
 
-	self.ed = C.exif_data_new_from_file(C.CString(file))
+	cfile := C.CString(file)
+
+	self.ed = C.exif_data_new_from_file(cfile)
+	defer C.free(unsafe.Pointer(self.ed))
+
+	C.free(unsafe.Pointer(cfile))
 
 	if self.ed == nil {
 		return fmt.Errorf("No EXIF data in file: %s\n", file)
