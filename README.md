@@ -32,6 +32,31 @@ for key, val := range exif.Tags {
 }
 ```
 
+If you just have the image available as an io.Reader, you can parse the
+EXIF header like this:
+
+```
+reader := exif.New()
+
+_, err = io.Copy(reader, data)
+
+// exif.FoundExifInData is a signal that the EXIF parser has all it needs,
+// it doesn't need to be given the whole image.
+if err != nil && err != exif.FoundExifInData {
+  t.Fatalf("Error loading bytes: %s", err.Error())
+}
+
+err := exif.Parse()
+
+if err != nil {
+  t.Fatalf("Error parsing EXIF: %s", err.Error())
+}
+
+for key, val := range exif.Tags {
+  fmt.Printf("%s: %s\n", key, val)
+}
+```
+
 There is currently no support for writing EXIF data to images, however if
 someone would care to make the effort it would be great.
 
