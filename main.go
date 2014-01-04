@@ -31,6 +31,7 @@ package exif
 
 #include <stdlib.h>
 #include <libexif/exif-data.h>
+#include <libexif/exif-loader.h>
 #include "_cgo/types.h"
 
 exif_value_t* pop_exif_value(exif_stack_t *);
@@ -43,17 +44,19 @@ import "C"
 import (
 	"errors"
 	"fmt"
+	"runtime"
 	"strings"
 	"unsafe"
 )
 
 var (
-	ErrNoExifData = errors.New(`No EXIF data in file %s.`)
+	ErrNoExifData   = errors.New(`No EXIF data in file %s.`)
+	FoundExifInData = errors.New("Found EXIF header. OK to call Parse.")
 )
 
 type Data struct {
-	exifData *C.ExifData
-	Tags     map[string]string
+	exifLoader *C.ExifLoader
+	Tags       map[string]string
 }
 
 // Creates and returns an empty exif.Data object.
@@ -68,19 +71,23 @@ func (self *Data) Open(file string) error {
 
 	cfile := C.CString(file)
 
-	self.exifData = C.exif_data_new_from_file(cfile)
-
-	defer func() {
-		C.free(unsafe.Pointer(self.exifData))
-	}()
+	exifData := C.exif_data_new_from_file(cfile)
 
 	C.free(unsafe.Pointer(cfile))
 
-	if self.exifData == nil {
+	if exifData == nil {
 		return fmt.Errorf(ErrNoExifData.Error(), file)
 	}
 
-	values := C.exif_dump(self.exifData)
+	defer func() {
+		C.exif_data_unref(exifData)
+	}()
+
+	return self.parseExifData(exifData)
+}
+
+func (self *Data) parseExifData(exifData *C.ExifData) error {
+	values := C.exif_dump(exifData)
 
 	for {
 		value := C.pop_exif_value(values)
@@ -95,4 +102,43 @@ func (self *Data) Open(file string) error {
 	C.free(unsafe.Pointer(values))
 
 	return nil
+}
+
+// Sends bytes to the exif loader. "Errors" FoundExifInData when enough bytes have been sent.
+func (self *Data) Write(p []byte) (n int, err error) {
+	if self.exifLoader == nil {
+		self.exifLoader = C.exif_loader_new()
+		runtime.SetFinalizer(self, (*Data).cleanup)
+	}
+
+	res := C.exif_loader_write(self.exifLoader, (*C.uchar)(unsafe.Pointer(&p[0])), C.uint(len(p)))
+
+	if res == 1 {
+		return len(p), nil
+	} else {
+		return len(p), FoundExifInData
+	}
+}
+
+// Finalizes the data loader and sets the Tags
+func (self *Data) Parse() error {
+	defer self.cleanup()
+
+	exifData := C.exif_loader_get_data(self.exifLoader)
+	if exifData == nil {
+		return fmt.Errorf(ErrNoExifData.Error(), "")
+	}
+
+	defer func() {
+		C.exif_data_unref(exifData)
+	}()
+
+	return self.parseExifData(exifData)
+}
+
+func (self *Data) cleanup() {
+	if self.exifLoader != nil {
+		C.exif_loader_unref(self.exifLoader)
+		self.exifLoader = nil
+	}
 }
