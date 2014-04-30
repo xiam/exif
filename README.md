@@ -27,7 +27,7 @@ if err != nil {
   t.Fatalf("Error: %s", err.Error())
 }
 
-for key, val := range exif.Tags {
+for key, val := range reader.Tags {
   fmt.Printf("%s: %s\n", key, val)
 }
 ```
