@@ -52,3 +52,38 @@ func TestWriteAndParse(t *testing.T) {
 		fmt.Printf("%s: %s\n", key, val)
 	}
 }
+
+func TestGetLongitude(t *testing.T) {
+	exif := New()
+	err := exif.Open("_examples/resources/testlocation.jpg")
+	if err != nil {
+		t.Fatalf("Error: %s", err.Error())
+	}
+	
+	longitude, ok := exif.Tags["Longitude"]
+	if !ok {
+		t.Fatalf("Error: Tag \"Longitude\" could not be found")
+	}
+	
+	if longitude != "131,  0, 55.2063" {
+		t.FailNow()
+	}
+	
+	
+}
+
+func TestGetLatitude(t *testing.T) {
+	exif := New()
+	err := exif.Open("_examples/resources/testlocation.jpg")
+	if err != nil {
+		t.Fatalf("Error: %s", err.Error())
+	}
+	latitude, ok := exif.Tags["Latitude"]
+	if !ok {
+		t.Fatalf("Error: Tag \"Latitude\" could not be found")
+	}
+	
+	if latitude != "25, 21, 32.6101" 	{
+		t.Fatalf("Error:\n Expected 25, 21, 32.6101\n Found: %s",latitude)
+	}
+}
