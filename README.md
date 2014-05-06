@@ -19,16 +19,26 @@ import "github.com/gosexy/exif"
 This is an example on how to read EXIF data from a file:
 
 ```
-reader := exif.New()
+package main
 
-err := reader.Open("_examples/resources/test.jpg")
+import "fmt"
+import "github.com/gosexy/exif"
 
-if err != nil {
-  t.Fatalf("Error: %s", err.Error())
-}
+func main() {
+    
+    // open an exif reader and read the file from system
+    reader := exif.New()
+    err := reader.Open("_examples/resources/test.jpg")
+    
+    // check to make sure we can read the exif data
+    if err != nil {
+        fmt.Printf("Error: %s", err.Error())
+    }
 
-for key, val := range exif.Tags {
-  fmt.Printf("%s: %s\n", key, val)
+    // print out key,val pair for each tag
+    for key, val := range reader.Tags {
+        fmt.Printf("%s: %s\n", key, val)
+    }
 }
 ```
 
