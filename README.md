@@ -56,13 +56,13 @@ if err != nil && err != exif.FoundExifInData {
   t.Fatalf("Error loading bytes: %s", err.Error())
 }
 
-err := exif.Parse()
+err := reader.Parse()
 
 if err != nil {
   t.Fatalf("Error parsing EXIF: %s", err.Error())
 }
 
-for key, val := range exif.Tags {
+for key, val := range reader.Tags {
   fmt.Printf("%s: %s\n", key, val)
 }
 ```
