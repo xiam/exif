@@ -1,8 +1,21 @@
-# gosexy/exif
+# Go (golang) bindings for libexif
 
-A primitive Go binding for [libexif][1].
+Provides basic support for reading EXIF tags on files using [libexif][1] and
+CGO.
 
 ## How to install
+
+Get libexif for your OS:
+
+```
+# OSX
+brew install libexif
+
+# Debian
+apt-get install -y libexif-dev
+```
+
+Then grab the exif package with `go get`:
 
 ```
 go get github.com/gosexy/exif
@@ -10,7 +23,8 @@ go get github.com/gosexy/exif
 
 ## Usage
 
-Install the package with `go get` and use `import` to include it in your project.
+Install the package with `go get` and use `import` to include it in your
+project:
 
 ```
 import "github.com/gosexy/exif"
@@ -18,32 +32,25 @@ import "github.com/gosexy/exif"
 
 This is an example on how to read EXIF data from a file:
 
-```
+```go
 package main
 
-import "fmt"
-import "github.com/gosexy/exif"
+import (
+  "fmt"
+  "github.com/gosexy/exif"
+)
 
 func main() {
-    
-    // open an exif reader and read the file from system
-    reader := exif.New()
-    err := reader.Open("_examples/resources/test.jpg")
-    
-    // check to make sure we can read the exif data
-    if err != nil {
-        fmt.Printf("Error: %s", err.Error())
-    }
-
-    // print out key,val pair for each tag
-    for key, val := range reader.Tags {
-        fmt.Printf("%s: %s\n", key, val)
+    data, err := exif.Read("_examples/resources/test.jpg")
+    ...
+    for key, val := range data.Tags {
+        fmt.Printf("%s = %s\n", key, val)
     }
 }
 ```
 
-If you just have the image available as an io.Reader, you can parse the
-EXIF header like this:
+If you just have the image available as an io.Reader, you can parse the EXIF
+header like this:
 
 ```
 reader := exif.New()
@@ -67,14 +74,11 @@ for key, val := range reader.Tags {
 }
 ```
 
-There is currently no support for writing EXIF data to images, however if
-someone would care to make the effort it would be great.
-
 ## License
 
 This is Open Source released under the terms of the MIT License:
 
-> Copyright (c) 2012-2013 José Carlos Nieto, http://xiam.menteslibres.org/
+> Copyright (c) 2012-2015 José Carlos Nieto, https://menteslibres.net/xiam
 >
 > Permission is hereby granted, free of charge, to any person obtaining
 > a copy of this software and associated documentation files (the

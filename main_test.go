@@ -2,6 +2,7 @@ package exif
 
 import (
 	"fmt"
+	"github.com/stretchr/testify/assert"
 	"io"
 	"os"
 	"testing"
@@ -12,12 +13,21 @@ func TestOpen(t *testing.T) {
 
 	// http://www.exif.org/samples/fujifilm-mx1700.jpg
 	err := exif.Open("_examples/resources/test.jpg")
+	assert.NoError(t, err)
+	assert.True(t, len(exif.Tags) > 0)
 
-	if err != nil {
-		t.Fatalf("Error: %s", err.Error())
+	for key, val := range exif.Tags {
+		fmt.Printf("%s: %s\n", key, val)
 	}
+}
 
-	fmt.Println("----- Open")
+func TestRead(t *testing.T) {
+	// http://www.exif.org/samples/fujifilm-mx1700.jpg
+	exif, err := Read("_examples/resources/test.jpg")
+
+	assert.NoError(t, err)
+	assert.True(t, len(exif.Tags) > 0)
+
 	for key, val := range exif.Tags {
 		fmt.Printf("%s: %s\n", key, val)
 	}
@@ -29,25 +39,18 @@ func TestWriteAndParse(t *testing.T) {
 	// http://www.exif.org/samples/fujifilm-mx1700.jpg
 	file, err := os.Open("_examples/resources/test.jpg")
 
-	if err != nil {
-		t.Fatalf("Error: %s", err.Error())
-	}
+	assert.NoError(t, err)
 
 	defer file.Close()
 
 	_, err = io.Copy(exif, file)
 
-	if err != nil && err != FoundExifInData {
-		t.Fatalf("Error: %s", err.Error())
-	}
+	assert.Error(t, err)
+	assert.Equal(t, ErrFoundExifInData, err)
 
 	err = exif.Parse()
+	assert.NoError(t, err)
 
-	if err != nil {
-		t.Fatalf("Error: %s", err.Error())
-	}
-
-	fmt.Println("----- Write and Parse")
 	for key, val := range exif.Tags {
 		fmt.Printf("%s: %s\n", key, val)
 	}
@@ -56,34 +59,20 @@ func TestWriteAndParse(t *testing.T) {
 func TestGetLongitude(t *testing.T) {
 	exif := New()
 	err := exif.Open("_examples/resources/testlocation.jpg")
-	if err != nil {
-		t.Fatalf("Error: %s", err.Error())
-	}
-	
+	assert.NoError(t, err)
+
 	longitude, ok := exif.Tags["Longitude"]
-	if !ok {
-		t.Fatalf("Error: Tag \"Longitude\" could not be found")
-	}
-	
-	if longitude != "131,  0, 55.2063" {
-		t.FailNow()
-	}
-	
-	
+	assert.True(t, ok)
+
+	assert.Equal(t, "131,  0, 55.2063", longitude)
 }
 
 func TestGetLatitude(t *testing.T) {
 	exif := New()
 	err := exif.Open("_examples/resources/testlocation.jpg")
-	if err != nil {
-		t.Fatalf("Error: %s", err.Error())
-	}
+	assert.NoError(t, err)
 	latitude, ok := exif.Tags["Latitude"]
-	if !ok {
-		t.Fatalf("Error: Tag \"Latitude\" could not be found")
-	}
-	
-	if latitude != "25, 21, 32.6101" 	{
-		t.Fatalf("Error:\n Expected 25, 21, 32.6101\n Found: %s",latitude)
-	}
+	assert.True(t, ok)
+
+	assert.Equal(t, "25, 21, 32.6101", latitude)
 }
