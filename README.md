@@ -18,7 +18,7 @@ apt-get install -y libexif-dev
 Then grab the exif package with `go get`:
 
 ```
-go get github.com/gosexy/exif
+go get github.com/xiam/exif
 ```
 
 ## Usage
@@ -27,7 +27,7 @@ Install the package with `go get` and use `import` to include it in your
 project:
 
 ```
-import "github.com/gosexy/exif"
+import "github.com/xiam/exif"
 ```
 
 This is an example on how to read EXIF data from a file:
@@ -37,7 +37,7 @@ package main
 
 import (
   "fmt"
-  "github.com/gosexy/exif"
+  "github.com/xiam/exif"
 )
 
 func main() {
