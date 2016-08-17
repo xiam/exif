@@ -13,6 +13,9 @@ brew install libexif
 
 # Debian
 apt-get install -y libexif-dev
+
+# RedHat
+dnf install -y libexif-devel
 ```
 
 Then grab the exif package with `go get`:
