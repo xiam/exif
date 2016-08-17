@@ -23,9 +23,6 @@
 package exif
 
 /*
-#cgo LDFLAGS: -lexif
-#cgo pkg-config: libexif
-
 #include <stdlib.h>
 #include <libexif/exif-data.h>
 #include <libexif/exif-loader.h>
@@ -34,7 +31,6 @@ package exif
 exif_value_t* pop_exif_value(exif_stack_t *);
 void free_exif_value(exif_value_t* n);
 exif_stack_t* exif_dump(ExifData *);
-
 */
 import "C"
 
