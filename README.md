@@ -60,9 +60,9 @@ reader := exif.New()
 
 _, err = io.Copy(reader, data)
 
-// exif.FoundExifInData is a signal that the EXIF parser has all it needs,
+// exif.ErrFoundExifInData is a signal that the EXIF parser has all it needs,
 // it doesn't need to be given the whole image.
-if err != nil && err != exif.FoundExifInData {
+if err != nil && err != exif.ErrFoundExifInData {
   t.Fatalf("Error loading bytes: %s", err.Error())
 }
 
