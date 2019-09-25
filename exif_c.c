@@ -27,7 +27,7 @@
 
 #include <libexif/exif-data.h>
 
-#include "_cgo/types.h"
+#include "cgo/types.h"
 
 #define EXIF_VALUE_MAXLEN 256
 
