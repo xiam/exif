@@ -26,7 +26,7 @@ package exif
 #include <stdlib.h>
 #include <libexif/exif-data.h>
 #include <libexif/exif-loader.h>
-#include "_cgo/types.h"
+#include "types.h"
 
 exif_value_t* pop_exif_value(exif_stack_t *);
 void free_exif_value(exif_value_t* n);
